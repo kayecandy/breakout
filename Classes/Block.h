@@ -10,15 +10,19 @@ public:
 	static class Block* create();
 	virtual bool init();
 
+	void allowMovement();
+	void blockMovement();
+
 
 private:
 	// Variables
+	bool isBallMoving = false;
 	float movementSpeed = .005;
 	float movementFast = 3;
 	float movementNormal = 3;
 	float movementDistance = movementNormal;
 
-	int distanceFromCenter = 300;
+	int distanceFromCenter = 350;
 	float positionAngle = 0;
 
 	// Sprite
@@ -39,8 +43,8 @@ private:
 
 	//Physics
 	cocos2d::PhysicsBody* physicsBody;
-	float density = 0.1;
-	float friction = 0.0;
+	float density = 100000;
+	float friction = 0.5;
 	float restitution = 1.0;
 
 };

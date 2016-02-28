@@ -17,10 +17,23 @@ public:
 	// implement the "static create()" method manually
 	CREATE_FUNC(GameScene);
 
-private:
-	cocos2d::Scene* scene;
 
+private:
+	// Variables
+	float instructionsFadeSpeed = 0.3;
+	bool isFaded = false;
+
+	// Objects
+	cocos2d::Scene* scene;
+	cocos2d::Sprite* instructionsSprite;
+	class Ball* ball;
+	class FluffGenerator* fluffGenerator;
+
+	// Initializer
 	void initPhysics();
+
+	// Update
+	void update(float) override;
 
 };
 

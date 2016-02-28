@@ -18,6 +18,9 @@
 #include "Planet.h"
 #include "GameScene.h"
 #include "Block.h"
+#include "Fluff.h"
+#include "FluffGenerator.h"
+#include "Ball.h"
 
 USING_NS_CC;
 
@@ -29,9 +32,20 @@ namespace{
 		INDEX_PLANET = 1,
 		INDEX_PLANET_GLOW = 2,
 
-		INDEX_BLOCK = 3
+		INDEX_BLOCK = 3,
+
+		INDEX_FLUFF = 4,
+		INDEX_FLUFF_EYES = 5,
+
+		INDEX_BALL = 6,
+
+		INDEX_INSTRUCTIONS
 
 	};
+
+	char* NAME_BALL = "Ball";
+	char* NAME_FLUFF = "Fluff";
+	char* NAME_BLOCK = "Block";
 
 	char* SPRITE_SOURCE[] = {
 		"Background2.png",
@@ -39,9 +53,18 @@ namespace{
 		"Planet.png",
 		"PlanetGlow.png",
 
-		"Block.png"
+		"Block.png",
+
+		"Fluff.png",
+		"FluffEyes.png",
+
+		"Ball.png",
+
+		"Instructions.png"
 
 	};
+
+	int CONTACT_GROUP_FLUFF = 1;
 
 	Size GET_VISIBLE_SIZE(){
 		return cocos2d::Director::getInstance()->getVisibleSize();
@@ -66,7 +89,70 @@ namespace{
 		return cos(angle*M_PI / 180.0f);
 	}
 
+	double asind(double angle){
+		return asin(angle*M_PI / 180.0f);
+	}
+	double acosd(double angle){
+		return acos(angle*M_PI / 180.0f);
+	}
+	double atand(double angle){
+		return atan(angle) * 180 / M_PI;
+	}
+
+	float GET_DISTANCE_FROM_CENTER(float x, float y){
+		float dX = SCREEN_WIDTH / 2 - x;
+		float dY = SCREEN_HEIGHT / 2 - y;
+
+		return sqrt(dX*dX + dY*dY);
+	}
+
+	float GET_DISTANCE_FROM_CENTER_X(float x){
+		return x - SCREEN_WIDTH / 2;
+	}
+	float GET_DISTANCE_FROM_CENTER_Y(float y){
+		return y - SCREEN_HEIGHT / 2;
+	}
+
+	bool IS_INSIDE_SCREEN(cocos2d::Vec2 position){
+		if (position.x <= 0 || position.x >= SCREEN_WIDTH)
+			return false;
+
+		if (position.y <= 0 || position.y >= SCREEN_HEIGHT)
+			return false;
+
+		return true;
+	}
+
+	bool TEST_CONTACT(cocos2d::PhysicsContact& contact, char* nameA, char*nameB){
+		auto bodyA = contact.getShapeA()->getBody();
+		auto bodyB = contact.getShapeB()->getBody();
+
+		if ((bodyA->getNode()->getName() == nameA
+			|| bodyB->getNode()->getName() == nameB)
+			&&
+			(bodyA->getNode()->getName() == nameA
+			|| bodyB->getNode()->getName() == nameB)){
+			return true;
+		}
+
+		return false;
+	}
+
+	cocos2d::Node* GET_BODY_FROM_CONTACT(cocos2d::PhysicsContact& contact, char* name){
+		auto bodyA = contact.getShapeA()->getBody()->getNode();
+		auto bodyB = contact.getShapeB()->getBody()->getNode();
+
+		if (bodyA->getName() == name)
+			return bodyA;
+		else if (bodyB->getName() == name)
+			return bodyB;
+	
+		return NULL;
+	}
+
 }
+
+
 
 
 #endif // __GLOBALS_H__

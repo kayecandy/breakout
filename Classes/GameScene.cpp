@@ -43,35 +43,76 @@ bool GameScene::init()
 
 	auto planet = Planet::create();
 	planet->setPosition(POSITION_CENTER_CENTER);
-	this->addChild(planet, 1);
+	this->addChild(planet, 2);
 
 
 	auto block = Block::create();
 	this->addChild(block, 1);
 
-	
-	
-	auto test = PhysicsJointRotarySpring::construct(
-		planet->getPhysicsBody(),
-		block->getPhysicsBody(), 0.5, 0.2);
 
-	test->createConstraints();
+	ball = Ball::create(block);
+	this->addChild(ball, 1);
 
-	PhysicsJointRotaryLimit::construct(
-		planet->getPhysicsBody(),
-		block->getPhysicsBody(),
-		10 * 180 / M_PI,
-		90 * 180 / M_PI);
+	fluffGenerator = FluffGenerator::create(this);
+	this->addChild(fluffGenerator, 1);
 
 
+	fluffGenerator->generateInitialFluff();
 
+	instructionsSprite = Sprite::create(SPRITE_SOURCE[INDEX_INSTRUCTIONS]);
+	instructionsSprite->setPosition(POSITION_CENTER_CENTER);
+	this->addChild(instructionsSprite, 5);
+	//instructionsSprite->updateDisplayedOpacity(255);
+
+	this->scheduleUpdate();
 
 	return true;
 }
 
 void GameScene::initPhysics(){
-	//scene->getPhysicsWorld()->setGravity(Vec2(0,0));
+	scene->getPhysicsWorld()->setGravity(Vec2(0,0));
+	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 }
+
+void GameScene::update(float delta){
+	//cocos2d::log("opacity: %d", instructionsSprite->getDisplayedOpacity());
+
+	if (ball->isMoving && !isFaded){
+		isFaded = true;
+		instructionsSprite->runAction(FadeOut::create(instructionsFadeSpeed));
+		fluffGenerator->startContinousGeneration();
+
+
+
+		for (Node* n : this->getChildren())
+		{
+			if (dynamic_cast<Fluff*>(n)){
+				auto f = dynamic_cast<Fluff*>(n);
+				f->enableExpand();
+			}
+		}
+
+		cocos2d::log("correct1");
+
+
+	}
+	else if (!ball->isMoving && isFaded){
+		isFaded = false;
+		instructionsSprite->runAction(FadeIn::create(instructionsFadeSpeed));
+		fluffGenerator->stopContinousGeneration();
+
+		for (Node* n : this->getChildren())
+		{
+			if (dynamic_cast<Fluff*>(n)){
+				auto f = dynamic_cast<Fluff*>(n);
+				f->disableExpand();
+			}
+		}
+	}
+
+}
+
+
 
 void GameScene::menuCloseCallback(Ref* pSender)
 {

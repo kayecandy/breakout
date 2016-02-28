@@ -30,10 +30,20 @@ bool Block::init(){
 void Block::initializeNode(){
 	blockSprite = Sprite::create(SPRITE_SOURCE[INDEX_BLOCK]);
 	this->addChild(blockSprite);
-	setRelativePosition(30);
+	this->setName(NAME_BLOCK);
 
-	physicsBody = PhysicsBody::createBox(blockSprite->getContentSize(), PhysicsMaterial(density, restitution, friction));
+	physicsBody = PhysicsBody::createBox(
+		blockSprite->getContentSize(), 
+		PhysicsMaterial(density, restitution, friction));
+	
+	//physicsBody->setDynamic(false);
+	physicsBody->setRotationEnable(false);
+	physicsBody->setContactTestBitmask(0x01);
+	physicsBody->setCategoryBitmask(0x03);
+	
 	this->setPhysicsBody(physicsBody);
+
+	setRelativePosition(30);
 
 }
 
@@ -67,15 +77,19 @@ void Block::onKeyboardPressed(EventKeyboard::KeyCode key, Event* e){
 	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
 		isKeyPressed = true;
 
-		this->runAction(Sequence::create(
-			DelayTime::create(movementSpeed),
-			CallFunc::create(std::bind(&Block::whileKeyboardPressed, this, key, e)),
-			NULL));
+		if (isBallMoving)
+			this->runAction(Sequence::create(
+				DelayTime::create(movementSpeed),
+				CallFunc::create(std::bind(&Block::whileKeyboardPressed, this, key, e)),
+				NULL));
+
 		break;
 	case EventKeyboard::KeyCode::KEY_SPACE:
 		movementDistance += movementFast;
 		break;
 	}
+
+	cocos2d::log("correct2");
 	
 	
 }
@@ -110,4 +124,13 @@ void Block::onKeyboardReleased(EventKeyboard::KeyCode key, Event* e){
 		break;
 	}
 
+}
+
+void Block::allowMovement(){
+	isBallMoving = true;
+}
+
+void Block::blockMovement(){
+	isBallMoving = false;
+	
 }
