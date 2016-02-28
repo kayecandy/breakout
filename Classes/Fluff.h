@@ -19,8 +19,8 @@ private:
 	float movementSpeed = 25;
 
 	float isExpandEnabled = false;
-	float expandIndexMin = 0.0005;
-	float expandIndexMax = 0.00009;
+	float expandIndexMin = 0.00009;
+	float expandIndexMax = 0.0005;
 	float expandMax = 1.55;
 	
 	
